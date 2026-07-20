@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher's Gradebook</title>
+  <link rel="stylesheet" href="./complextable.css">
+  <script src="./complextable.js"></script>
+</head>
+<body>
+  <div class="page">
+    <!-- ======== HEADER (fixed at top) ======== -->
+    <header>
+      <h1>Teacher's Gradebook</h1>
+    </header>
+
+    <!-- ======== MAIN CONTENT ======== -->
+    <div class="main-content">
+      <!--
+        Top Scrollbar: A custom container that mirrors the table's horizontal
+        scroll extent. A dummy <div> inside is resized by JS to match the
+        table's scrollWidth, creating a synchronized scrollbar.
+      -->
+      <div class="top-scrollbar-container" id="topScrollbar">
+        <div class="top-scrollbar-dummy" id="topScrollbarDummy"></div>
+      </div>
+
+      <!--
+        Table Container Wrapper: overflow:hidden clips the horizontal scrollbar.
+        It does NOT scroll itself, so it is not a scroll ancestor —
+        position:sticky inside .table-container still works correctly.
+
+        Table Container: Single scroll container (overflow:auto both axes).
+        height: calc(100% + 15px) extends it below the wrapper so the native
+        horizontal scrollbar is clipped. Vertical scrollbar stays visible.
+      -->
+      <div class="table-container-wrapper">
+        <div class="table-container" id="tableContainer">
+          <table id="gradebookTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== FOOTER (fixed at bottom) ======== -->
+    <footer>
+      <span id="footerInfo">Loading...</span>
+      <span>Teacher's Gradebook v1.0</span>
+    </footer>
+  </div>
+
+  <script>
+    /**
+     * ================================================================
+     * Mock Data & Initialization
+     * ================================================================
+     *
+     * This script is the ONLY place with domain knowledge (students,
+     * assignments, grades). It generates mock data and feeds it into
+     * the generic Gradebook class above.
+     */
+    (function () {
+      'use strict';
+
+      /* ==============================================================
+         CONFIGURATION
+         ============================================================== */
+      var TOTAL_ROWS = 60;
+      var TOTAL_COLS = 15;        // 1 name + 22 assignments + 1 average + 1 final
+      var NUM_ASSIGNMENTS = TOTAL_COLS - 3; // 22
+
+      /* ==============================================================
+         NAME POOLS
+         ============================================================== */
+      var FIRST_NAMES = [
+        'Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason',
+        'Isabella', 'William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia',
+        'Lucas', 'Harper', 'Henry', 'Evelyn', 'Alexander', 'Abigail', 'Michael',
+        'Emily', 'Daniel', 'Elizabeth', 'Jacob', 'Sofia', 'Logan', 'Avery',
+        'Jackson', 'Ella', 'Sebastian', 'Scarlett', 'Aiden', 'Grace', 'Matthew',
+        'Victoria', 'Samuel', 'Riley', 'David', 'Aria', 'Joseph', 'Lily',
+        'Carter', 'Aurora', 'Owen', 'Chloe', 'Wyatt', 'Penelope', 'John',
+        'Layla'
+      ];
+
+      var LAST_NAMES = [
+        'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
+        'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez',
+        'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
+        'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark',
+        'Ramirez', 'Lewis', 'Robinson', 'Walker', 'Young', 'Allen', 'King',
+        'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green',
+        'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell',
+        'Carter', 'Roberts'
+      ];
+
+      var MONTHS = [
+        'Sep', 'Sep', 'Sep', 'Oct', 'Oct', 'Oct', 'Nov', 'Nov',
+        'Nov', 'Dec', 'Dec', 'Jan', 'Jan', 'Feb', 'Feb', 'Feb',
+        'Mar', 'Mar', 'Mar', 'Apr', 'Apr', 'Apr', 'May'
+      ];
+
+      /* ==============================================================
+         HELPER FUNCTIONS
+         ============================================================== */
+
+      function generateStudentName(index) {
+        var first = FIRST_NAMES[index % FIRST_NAMES.length];
+        var last = LAST_NAMES[index % LAST_NAMES.length];
+        var cycle = Math.floor(index / FIRST_NAMES.length);
+        if (cycle > 0) {
+          return last + ', ' + first + ' ' + String.fromCharCode(65 + cycle);
+        }
+        return last + ', ' + first;
+      }
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      /* ==============================================================
+         GENERATE HEADER ROWS
+         ============================================================== */
+      function generateHeaders() {
+        var row1 = ['Student Name'];
+        var row2 = [''];
+
+        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
+          row1.push('Asgn ' + (a + 1));
+          var month = MONTHS[a % MONTHS.length];
+          var day = randomInt(1, 28);
+          row2.push(month + ' ' + day + '\n100 pts');
+        }
+
+        row1.push('Average');
+        row2.push('Weighted');
+        row1.push('Final');
+        row2.push('Letter Grade');
+
+        return [row1, row2];
+      }
+
+      /* ==============================================================
+         GENERATE BODY ROWS
+         ============================================================== */
+      function generateBodyRows() {
+        var data = [];
+
+        for (var r = 0; r < TOTAL_ROWS; r++) {
+          var row = [];
+          row.push(generateStudentName(r));
+
+          var sum = 0;
+          for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
+            var score = randomInt(45, 100);
+            row.push(score);
+            sum += score;
+          }
+
+          var avg = (sum / NUM_ASSIGNMENTS).toFixed(1);
+          row.push(avg);
+
+          var avgNum = parseFloat(avg);
+          var grade;
+          if (avgNum >= 90)      grade = 'A';
+          else if (avgNum >= 80) grade = 'B';
+          else if (avgNum >= 70) grade = 'C';
+          else if (avgNum >= 60) grade = 'D';
+          else                   grade = 'F';
+          row.push(grade);
+
+          data.push(row);
+        }
+        return data;
+      }
+
+      /* ==============================================================
+         BUILD CELL CLASSES MAP
+         Per-column CSS classes for body cells.
+         ============================================================== */
+      function buildCellClasses() {
+        var classes = {};
+        var firstFixedRight = TOTAL_COLS - 2; // index 23
+
+        // Assignment score columns: center-align
+        for (var c = 1; c < firstFixedRight; c++) {
+          classes[c] = 'score-cell';
+        }
+        // Average column: center-align
+        classes[firstFixedRight] = 'score-cell';
+        // Final Grade column: bold center
+        classes[TOTAL_COLS - 1] = 'grade-cell';
+
+        return classes;
+      }
+
+      /* ==============================================================
+         INITIALIZATION — Create and render the Gradebook
+         ============================================================== */
+      var gradebook = new Gradebook({
+        config: {
+          topRows: [
+            { lines: 1 },  // Row 0: Main column headers (single line)
+            { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
+          ],
+          fixedRightCols: 2
+        },
+        headerRows: generateHeaders(),
+        bodyRows: generateBodyRows(),
+        cellClasses: buildCellClasses(),
+        elements: {
+          thead: 'tableHead',
+          tbody: 'tableBody',
+          topScrollbar: 'topScrollbar',
+          topDummy: 'topScrollbarDummy',
+          tableContainer: 'tableContainer',
+          table: 'gradebookTable',
+          footerInfo: 'footerInfo'
+        }
+      });
+
+      gradebook.render();
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+/* ============================================================
+    CSS VARIABLES — Design Tokens
+    All cosmetic AND structural sizing values are defined here
+    so the design system can be easily overridden.
+    ============================================================ */
+:root {
+    /* ---- Structural Sizing ---- */
+    --col-width-default: 100px;
+    --row-height-1line: 40px;
+    --row-height-2lines: 60px;
+
+    /* ---- Cosmetic: Colors ---- */
+    --color-bg: #ffffff;
+    --color-header-bg: #f7f8fa;
+    --color-border: #e2e2e2;
+    --color-text: #333333;
+    --color-text-light: #777777;
+    --color-sticky-left-bg: #f9fafb;
+    --color-sticky-right-bg: #f1f4f9;
+    --color-corner-bg: #e8ecf2;
+    --color-row-alt: #f5f6f8;
+    --color-row-alt-sticky-left: #f0f1f4;
+    --color-row-alt-sticky-right: #e8edf4;
+    --color-header-text: #1a1a2e;
+    --color-footer-bg: #f7f8fa;
+    --color-scrollbar-track: #f1f1f1;
+    --color-scrollbar-thumb: #b0b0b0;
+    --color-scrollbar-thumb-hover: #888888;
+
+    /* ---- Cosmetic: Typography ---- */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-size-base: 13px;
+    --font-size-header: 12px;
+    --font-size-title: 18px;
+    --font-size-small: 11px;
+
+    /* ---- Cosmetic: Spacing & Borders ---- */
+    --cell-padding-y: 6px;
+    --cell-padding-x: 10px;
+    --header-page-padding: 14px 20px;
+    --border-style: 1px solid var(--color-border);
+}
+
+/* ============================================================
+    STRUCTURAL CSS — Reset & Full-Viewport Flex Layout
+    ============================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/*
+    * .page uses a Flex column to fill the exact viewport height (100vh).
+    * Header and Footer are flex-shrink: 0 (fixed size).
+    * .main-content gets flex-grow: 1 (fills remaining space).
+    */
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background: var(--color-bg);
+}
+
+/* ============================================================
+    STRUCTURAL CSS — Header & Footer
+    ============================================================ */
+header {
+    flex-shrink: 0;
+    padding: var(--header-page-padding);
+    background: var(--color-header-bg);
+    border-bottom: var(--border-style);
+}
+
+header h1 {
+    font-size: var(--font-size-title);
+    color: var(--color-header-text);
+    font-weight: 600;
+}
+
+footer {
+    flex-shrink: 0;
+    padding: 8px 20px;
+    background: var(--color-footer-bg);
+    border-top: var(--border-style);
+    font-size: var(--font-size-small);
+    color: var(--color-text-light);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ============================================================
+    STRUCTURAL CSS — Main Content (Top Scrollbar + Table)
+    ============================================================ */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ---- Top Scrollbar Container ----
+    * Contains a dummy <div> whose width is synced to the table's scrollWidth.
+    * This creates a scrollbar that mirrors the table's horizontal extent.
+    */
+.top-scrollbar-container {
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 16px;
+    border-bottom: var(--border-style);
+    background: var(--color-header-bg);
+}
+
+.top-scrollbar-dummy {
+    height: 1px;
+}
+
+/* ---- Table Container ----
+    * CLIPPING STRATEGY to hide horizontal scrollbar, keep vertical:
+    *
+    * .table-container-wrapper (OUTER):
+    *   - flex-grow: 1 fills remaining vertical space.
+    *   - overflow: hidden clips whatever extends beyond its bounds.
+    *   - Does NOT scroll itself, so it is NOT a scroll ancestor.
+    *     This means position:sticky inside .table-container still works
+    *     because .table-container remains the ONLY scrolling ancestor.
+    *
+    * .table-container (INNER):
+    *   - The single scroll container (overflow: auto on both axes).
+    *   - height: calc(100% + 15px) makes it 15px taller than the wrapper.
+    *   - The native horizontal scrollbar (~15px) sits in that overflow zone
+    *     and is clipped by the wrapper's overflow:hidden.
+    *   - The vertical scrollbar remains fully visible on the right edge.
+    *   - position:sticky works for headers AND columns because this is
+    *     the single scrolling ancestor.
+    */
+.table-container-wrapper {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.table-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+/* Firefox: styled scrollbars */
+.table-container {
+    scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+}
+
+/* WebKit: styled scrollbars */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.table-container::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+}
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 4px;
+}
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-scrollbar-thumb-hover);
+}
+
+/* ============================================================
+    STRUCTURAL CSS — Table Base
+    ============================================================ */
+
+/*
+    * border-collapse: separate + border-spacing: 0 is REQUIRED so that
+    * sticky cells keep their borders and don't collapse/disappear on scroll.
+    */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: max-content;
+}
+
+th, td {
+    padding: var(--cell-padding-y) var(--cell-padding-x);
+    border-right: var(--border-style);
+    border-bottom: var(--border-style);
+    text-align: left;
+    vertical-align: middle;
+    background: var(--color-bg);
+}
+
+th {
+    font-size: var(--font-size-header);
+    font-weight: 600;
+    color: var(--color-header-text);
+    background: var(--color-header-bg);
+}
+
+/* ============================================================
+    STRUCTURAL CSS — Sticky Positioning & Z-Index Strategy
+    ============================================================
+    *
+    * Z-INDEX LAYERS (managed carefully to avoid overlapping issues):
+    *
+    *   z-index: 1  →  Regular scrolling body cells (default, set on <td>)
+    *   z-index: 2  →  Single-axis sticky edges:
+    *                   - Left column (sticky-left)
+    *                   - Right columns (sticky-right)
+    *                   - Top header rows (thead th)
+    *   z-index: 3  →  Intersection corners where two sticky axes meet:
+    *                   - Top-left (thead th.sticky-left)
+    *                   - Top-right (thead th.sticky-right)
+    *
+    * This ensures corners always paint on top of edges, and edges always
+    * paint on top of scrolling cells. Without this, scroll content would
+    * bleed through sticky elements.
+    */
+
+/* Body cells: base z-index */
+td {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---- Sticky LEFT column (Student Name) ----
+    * Pure CSS: position: sticky; left: 0;
+    * No JavaScript calculation needed.
+    * width: max-content adapts to the longest student name.
+    */
+.sticky-left {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--color-sticky-left-bg);
+    white-space: nowrap;
+    width: max-content;
+}
+
+/* ---- Sticky RIGHT columns ----
+    * The `right` offset is applied inline by JavaScript (see buildTable).
+    * All fixed-right columns share var(--col-width-default) width.
+    */
+.sticky-right {
+    position: sticky;
+    z-index: 2;
+    background: var(--color-sticky-right-bg);
+}
+
+/* ---- Sticky TOP rows (header) ----
+    * position: sticky is set here; the `top` and `height` values are
+    * applied as inline styles by JavaScript, using CSS variable math.
+    * No DOM measurement (getBoundingClientRect) is ever used.
+    */
+thead th {
+    position: sticky;
+    z-index: 2;
+}
+
+/* ---- Intersecting Corners ----
+    * Where a sticky header row meets a sticky left/right column,
+    * z-index must be 3 to sit above both single-axis sticky elements.
+    */
+thead th.sticky-left {
+    z-index: 3;
+    background: var(--color-corner-bg);
+}
+
+thead th.sticky-right {
+    z-index: 3;
+    background: var(--color-corner-bg);
+}
+
+/* ============================================================
+    COSMETIC CSS — Visual Polish
+    ============================================================ */
+
+/* Alternating row backgrounds.
+    * IMPORTANT: sticky cells need explicit opaque backgrounds so
+    * scrolling content does not bleed through from underneath.
+    */
+tbody tr:nth-child(even) td {
+    background: var(--color-row-alt);
+}
+tbody tr:nth-child(even) td.sticky-left {
+    background: var(--color-row-alt-sticky-left);
+}
+tbody tr:nth-child(even) td.sticky-right {
+    background: var(--color-row-alt-sticky-right);
+}
+
+/* Subtle shadow on the left sticky column to hint at scrollable area */
+.sticky-left {
+    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Sub-header row styling (smaller, lighter text with tighter line-height) */
+.sub-header {
+    font-weight: 400;
+    color: var(--color-text-light);
+    font-size: var(--font-size-small);
+    line-height: 1.3;
+}
+
+/* Center-align numeric score cells for readability */
+td.score-cell {
+    text-align: center;
+}
+
+/* Grade letter styling */
+td.grade-cell {
+    text-align: center;
+    font-weight: 600;
+}
