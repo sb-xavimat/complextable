@@ -267,7 +267,7 @@
         // Average column: center-align
         classes[firstFixedRight] = 'score-cell';
         // Final Grade column: bold center
-        classes[TOTAL_COLS - 1] = 'grade-cell';
+        classes[TOTAL_COLS - 1] = 'score-cell';
 
         return classes;
       }
@@ -286,6 +286,11 @@
         headerRows: generateHeaders1(),
         groups: generateGroups(),
         cellClasses: buildCellClasses(),
+        cellClassFn: function (col, val) {
+          if (typeof val === 'string') val = parseFloat(val);
+          if (isNaN(val)) return null;
+          return val < 60 ? 'score-fail' : 'score-pass';
+        },
         elements: {
           thead: 'tableHead',
           tbody: 'tableBody',

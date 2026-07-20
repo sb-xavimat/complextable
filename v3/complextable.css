@@ -378,12 +378,16 @@ tbody tr:nth-child(odd) td.sticky-right {
 /* Center-align numeric score cells for readability */
 td.score-cell {
     text-align: center;
+    font-weight: 700;
 }
 
-/* Grade letter styling */
-td.grade-cell {
-    text-align: center;
-    font-weight: 600;
+/* Score color coding */
+td.score-fail {
+    color: #990000;
+}
+
+td.score-pass {
+    color: #009900;
 }
 
 /* ============================================================
@@ -432,7 +436,6 @@ tbody tr.group-averages-row td,
 tbody tr.group-averages-row td.sticky-left,
 tbody tr.group-averages-row td.sticky-right {
     background: var(--color-group-averages-bg);
-    color: var(--color-group-averages-text);
     font-weight: var(--font-weight-group-averages);
     border-top: 2px solid var(--color-group-averages-border);
 }

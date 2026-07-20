@@ -41,6 +41,7 @@ var Gradebook = (function () {
         this.headerRows = options.headerRows;
         this.groups = options.groups;
         this.cellClasses = options.cellClasses || {};
+        this.cellClassFn = options.cellClassFn || null;
         this.els = options.elements;
     }
 
@@ -177,9 +178,15 @@ var Gradebook = (function () {
                 td.classList.add('sticky-left');
             }
 
-            // Apply per-column CSS classes (e.g., 'score-cell', 'grade-cell')
+            // Apply per-column CSS classes (e.g., 'score-cell')
             if (this.cellClasses[c]) {
                 td.classList.add(this.cellClasses[c]);
+            }
+
+            // Apply value-based CSS class via callback
+            if (this.cellClassFn) {
+                var extra = this.cellClassFn(c, val);
+                if (extra) td.classList.add(extra);
             }
 
             // Sticky right columns
