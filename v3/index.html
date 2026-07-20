@@ -81,7 +81,7 @@
          ============================================================== */
       var FIRST_NAMES = [
         'Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason',
-        'Isabella', 'William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia',
+        'Isabella', 'William William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia',
         'Lucas', 'Harper', 'Henry', 'Evelyn', 'Alexander', 'Abigail', 'Michael',
         'Emily', 'Daniel', 'Elizabeth', 'Jacob', 'Sofia', 'Logan', 'Avery',
         'Jackson', 'Ella', 'Sebastian', 'Scarlett', 'Aiden', 'Grace', 'Matthew',
@@ -128,8 +128,21 @@
       /* ==============================================================
          GENERATE HEADER ROWS
          ============================================================== */
-      function generateHeaders() {
-        var row1 = ['Student Name'];
+      function generateHeaders1() {
+        var row1 = [''];
+
+        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
+          row1.push('Asgn ' + (a + 1));
+        }
+
+        row1.push('Average');
+        row1.push('Weighted Average');
+
+        return [row1];
+      }
+
+      function generateHeaders2() {
+        var row1 = [''];
         var row2 = [''];
 
         for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
@@ -141,7 +154,7 @@
 
         row1.push('Average');
         row2.push('Weighted');
-        row1.push('Final');
+        row1.push('Weighted Average');
         row2.push('Letter Grade');
 
         return [row1, row2];
@@ -265,12 +278,12 @@
       var gradebook = new Gradebook({
         config: {
           topRows: [
-            { lines: 1 },  // Row 0: Main column headers (single line)
-            { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
+            { lines: 2 },  // Row 0: Main column headers (single line)
+            // { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
           ],
           fixedRightCols: 2
         },
-        headerRows: generateHeaders(),
+        headerRows: generateHeaders1(),
         groups: generateGroups(),
         cellClasses: buildCellClasses(),
         elements: {
