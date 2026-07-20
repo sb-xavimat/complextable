@@ -294,12 +294,18 @@ var Gradebook = (function () {
 
         var isSyncing = false;
 
-        // ResizeObserver: keep the dummy div width in sync with the table's scrollWidth
+        // ResizeObserver: keep the dummy div width in sync with the table's scrollWidth,
+        // accounting for the vertical scrollbar width (difference between
+        // tableContainer.clientWidth and topScrollbar.clientWidth).
+        function updateDummyWidth() {
+            topDummy.style.width = (table.scrollWidth - tableContainer.clientWidth + topScrollbar.clientWidth) + 'px';
+        }
         var resizeObserver = new ResizeObserver(function () {
-            topDummy.style.width = table.scrollWidth + 'px';
+            updateDummyWidth();
             adjustTableContainerHeight();
         });
         resizeObserver.observe(table);
+        resizeObserver.observe(tableContainer);
 
         // Sync: Top Scrollbar → Table Container
         topScrollbar.addEventListener('scroll', function () {
