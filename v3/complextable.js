@@ -220,28 +220,54 @@ var Gradebook = (function () {
         var fragment = document.createDocumentFragment();
         var g, r, i, group, nameData;
 
+        this._groupElements = [];
+
         for (g = 0; g < this.groups.length; g++) {
             group = this.groups[g];
 
-            // Group name row: label in col 0, empty elsewhere
+            // Group name row: toggle button + label in col 0, empty elsewhere
             nameData = [];
             for (i = 0; i < totalCols; i++) {
                 nameData.push(i === 0 ? group.name : '');
             }
-            fragment.appendChild(this._makeDataRow(nameData, 'group-name-row'));
+            var nameRow = this._makeDataRow(nameData, 'group-name-row');
+
+            var firstCell = nameRow.querySelector('td.sticky-left');
+            if (firstCell) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'group-toggle-btn';
+                btn.setAttribute('data-group', g);
+                var img = document.createElement('img');
+                img.src = '../imgs/expand_close.svg';
+                img.alt = 'Toggle group';
+                btn.appendChild(img);
+                firstCell.insertBefore(btn, firstCell.firstChild);
+            }
+            fragment.appendChild(nameRow);
 
             // Student rows
+            var contentRows = [];
             for (r = 0; r < group.rows.length; r++) {
-                fragment.appendChild(this._makeDataRow(group.rows[r]));
+                var row = this._makeDataRow(group.rows[r]);
+                fragment.appendChild(row);
+                contentRows.push(row);
             }
 
-            // Group averages row
+            // Group averages row (always visible, never collapsed)
             if (group.averagesRow) {
                 fragment.appendChild(this._makeDataRow(group.averagesRow, 'group-averages-row'));
             }
+
+            this._groupElements[g] = {
+                nameRow: nameRow,
+                contentRows: contentRows,
+                collapsed: false
+            };
         }
 
         tbody.appendChild(fragment);
+        this._setupGroupToggles();
     };
 
     /* ----------------------------------------------------------
@@ -296,6 +322,41 @@ var Gradebook = (function () {
         }
         window.addEventListener('resize', adjustTableContainerHeight);
         setTimeout(adjustTableContainerHeight, 0);
+    };
+
+    /* ----------------------------------------------------------
+        PRIVATE: Attach click handlers to all group toggle buttons.
+    ---------------------------------------------------------- */
+    Gradebook.prototype._setupGroupToggles = function () {
+        var self = this;
+        var buttons = document.querySelectorAll('.group-toggle-btn');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function () {
+                var groupIndex = parseInt(this.getAttribute('data-group'), 10);
+                self._toggleGroup(groupIndex);
+            });
+        }
+    };
+
+    /* ----------------------------------------------------------
+        PRIVATE: Toggle a group between collapsed and revealed.
+        Hides/shows student and averages rows, swaps SVG icon.
+    ---------------------------------------------------------- */
+    Gradebook.prototype._toggleGroup = function (groupIndex) {
+        var groupData = this._groupElements[groupIndex];
+        if (!groupData) return;
+
+        groupData.collapsed = !groupData.collapsed;
+
+        var img = groupData.nameRow.querySelector('.group-toggle-btn img');
+
+        for (var i = 0; i < groupData.contentRows.length; i++) {
+            groupData.contentRows[i].style.display = groupData.collapsed ? 'none' : '';
+        }
+
+        if (img) {
+            img.src = groupData.collapsed ? '../imgs/expand_open.svg' : '../imgs/expand_close.svg';
+        }
     };
 
     /* ----------------------------------------------------------

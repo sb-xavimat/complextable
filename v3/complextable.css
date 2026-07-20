@@ -65,6 +65,7 @@
     --color-scrollbar-track: #f1f1f1;
     --color-scrollbar-thumb: #b0b0b0;
     --color-scrollbar-thumb-hover: #888888;
+    --color-toggle-button-hover: #888888;
 
     /* ---- Group Name Row (configurable) ---- */
     --color-group-name-bg: #a6aaae;
@@ -398,6 +399,32 @@ tbody tr.group-name-row td.sticky-right {
     background: var(--color-group-name-bg);
     color: var(--color-group-name-text);
     font-weight: var(--font-weight-group-name);
+}
+
+/* ---- Group Toggle Button ---- */
+.group-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-right: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.group-toggle-btn:hover {
+    background-color: var(--color-toggle-button-hover);
+}
+
+.group-toggle-btn img {
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
 }
 
 /* ---- Group Averages Row ---- */
