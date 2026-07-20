@@ -67,9 +67,14 @@
       /* ==============================================================
          CONFIGURATION
          ============================================================== */
-      var TOTAL_ROWS = 60;
-      var TOTAL_COLS = 15;        // 1 name + 22 assignments + 1 average + 1 final
-      var NUM_ASSIGNMENTS = TOTAL_COLS - 3; // 22
+      var TOTAL_COLS = 15;        // 1 name + 12 assignments + 1 average + 1 grade
+      var NUM_ASSIGNMENTS = TOTAL_COLS - 3; // 12
+
+      var GROUPS_CONFIG = [
+        { name: 'Class 1A', size: 8  },
+        { name: 'Class 1B', size: 10 },
+        { name: 'Class 2A', size: 7  },
+      ];
 
       /* ==============================================================
          NAME POOLS
@@ -143,37 +148,95 @@
       }
 
       /* ==============================================================
-         GENERATE BODY ROWS
+         GENERATE A SINGLE STUDENT ROW
          ============================================================== */
-      function generateBodyRows() {
-        var data = [];
+      function generateStudentRow(index) {
+        var row = [];
+        row.push(generateStudentName(index));
 
-        for (var r = 0; r < TOTAL_ROWS; r++) {
-          var row = [];
-          row.push(generateStudentName(r));
+        var sum = 0;
+        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
+          var score = randomInt(45, 100);
+          row.push(score);
+          sum += score;
+        }
 
-          var sum = 0;
-          for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
-            var score = randomInt(45, 100);
-            row.push(score);
-            sum += score;
+        var avg = (sum / NUM_ASSIGNMENTS).toFixed(1);
+        row.push(avg);
+
+        var avgNum = parseFloat(avg);
+        var grade;
+        if (avgNum >= 90)      grade = 'A';
+        else if (avgNum >= 80) grade = 'B';
+        else if (avgNum >= 70) grade = 'C';
+        else if (avgNum >= 60) grade = 'D';
+        else                   grade = 'F';
+        row.push(grade);
+
+        return row;
+      }
+
+      /* ==============================================================
+         COMPUTE GROUP AVERAGES ROW
+         Averages each assignment column across all student rows in a
+         group, then computes the overall average and letter grade.
+         ============================================================== */
+      function computeGroupAveragesRow(groupRows) {
+        var row = ['Group Average'];
+        var r, a, colSum, groupAvg, grade;
+
+        // Average for each assignment column (cols 1 … NUM_ASSIGNMENTS)
+        for (a = 0; a < NUM_ASSIGNMENTS; a++) {
+          colSum = 0;
+          for (r = 0; r < groupRows.length; r++) {
+            colSum += parseFloat(groupRows[r][1 + a]) || 0;
+          }
+          row.push((colSum / groupRows.length).toFixed(1));
+        }
+
+        // Overall average (mean of student averages in col NUM_ASSIGNMENTS + 1)
+        var avgColIndex = 1 + NUM_ASSIGNMENTS;
+        colSum = 0;
+        for (r = 0; r < groupRows.length; r++) {
+          colSum += parseFloat(groupRows[r][avgColIndex]) || 0;
+        }
+        groupAvg = colSum / groupRows.length;
+        row.push(groupAvg.toFixed(1));
+
+        if (groupAvg >= 90)      grade = 'A';
+        else if (groupAvg >= 80) grade = 'B';
+        else if (groupAvg >= 70) grade = 'C';
+        else if (groupAvg >= 60) grade = 'D';
+        else                     grade = 'F';
+        row.push(grade);
+
+        return row;
+      }
+
+      /* ==============================================================
+         GENERATE ALL GROUPS
+         ============================================================== */
+      function generateGroups() {
+        var groups = [];
+        var studentIndex = 0;
+
+        for (var g = 0; g < GROUPS_CONFIG.length; g++) {
+          var cfg = GROUPS_CONFIG[g];
+          var rows = [];
+
+          for (var s = 0; s < cfg.size; s++) {
+            rows.push(generateStudentRow(studentIndex));
+            studentIndex++;
           }
 
-          var avg = (sum / NUM_ASSIGNMENTS).toFixed(1);
-          row.push(avg);
-
-          var avgNum = parseFloat(avg);
-          var grade;
-          if (avgNum >= 90)      grade = 'A';
-          else if (avgNum >= 80) grade = 'B';
-          else if (avgNum >= 70) grade = 'C';
-          else if (avgNum >= 60) grade = 'D';
-          else                   grade = 'F';
-          row.push(grade);
-
-          data.push(row);
+          groups.push({
+            name: cfg.name,
+            rows: rows,
+            averagesRow: computeGroupAveragesRow(rows)
+          });
         }
-        return data;
+
+        return groups;
       }
 
       /* ==============================================================
@@ -208,7 +271,7 @@
           fixedRightCols: 2
         },
         headerRows: generateHeaders(),
-        bodyRows: generateBodyRows(),
+        groups: generateGroups(),
         cellClasses: buildCellClasses(),
         elements: {
           thead: 'tableHead',

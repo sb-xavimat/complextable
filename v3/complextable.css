@@ -11,7 +11,9 @@
 
     /* ---- Cosmetic: Colors ---- */
     --color-bg: #ffffff;
-    --color-header-bg: #f7f8fa;
+    --color-header-bg: #4e555e;
+    --color-hscroll-bg: #f7f8fa;
+    --color-th-bg: #f7f8fa;
     --color-border: #e2e2e2;
     --color-text: #333333;
     --color-text-light: #777777;
@@ -21,11 +23,23 @@
     --color-row-alt: #f5f6f8;
     --color-row-alt-sticky-left: #f0f1f4;
     --color-row-alt-sticky-right: #e8edf4;
-    --color-header-text: #1a1a2e;
+    --color-header-text: #ffffff;
+    --color-th-text: #1a1a2e;
     --color-footer-bg: #f7f8fa;
     --color-scrollbar-track: #f1f1f1;
     --color-scrollbar-thumb: #b0b0b0;
     --color-scrollbar-thumb-hover: #888888;
+
+    /* ---- Group Name Row (configurable) ---- */
+    --color-group-name-bg: #2d4a6e;
+    --color-group-name-text: #ffffff;
+    --font-weight-group-name: 700;
+
+    /* ---- Group Averages Row (configurable) ---- */
+    --color-group-averages-bg: #dce8fb;
+    --color-group-averages-text: #1a3565;
+    --color-group-averages-border: #9ab4e0;
+    --font-weight-group-averages: 600;
 
     /* ---- Cosmetic: Typography ---- */
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -117,7 +131,7 @@ footer {
     overflow-y: hidden;
     height: 16px;
     border-bottom: var(--border-style);
-    background: var(--color-header-bg);
+    background: var(--color-hscroll-bg);
 }
 
 .top-scrollbar-dummy {
@@ -187,6 +201,7 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     width: max-content;
+    margin: auto;
 }
 
 th, td {
@@ -201,8 +216,8 @@ th, td {
 th {
     font-size: var(--font-size-header);
     font-weight: 600;
-    color: var(--color-header-text);
-    background: var(--color-header-bg);
+    color: var(--color-th-text);
+    background: var(--color-th-bg);
 }
 
 /* ============================================================
@@ -319,4 +334,29 @@ td.score-cell {
 td.grade-cell {
     text-align: center;
     font-weight: 600;
+}
+
+/* ============================================================
+    COSMETIC CSS — Group Rows
+    Configurable via CSS variables in :root.
+    Higher specificity overrides alternating-row backgrounds.
+    ============================================================ */
+
+/* ---- Group Name Row ---- */
+tbody tr.group-name-row td,
+tbody tr.group-name-row td.sticky-left,
+tbody tr.group-name-row td.sticky-right {
+    background: var(--color-group-name-bg);
+    color: var(--color-group-name-text);
+    font-weight: var(--font-weight-group-name);
+}
+
+/* ---- Group Averages Row ---- */
+tbody tr.group-averages-row td,
+tbody tr.group-averages-row td.sticky-left,
+tbody tr.group-averages-row td.sticky-right {
+    background: var(--color-group-averages-bg);
+    color: var(--color-group-averages-text);
+    font-weight: var(--font-weight-group-averages);
+    border-top: 2px solid var(--color-group-averages-border);
 }

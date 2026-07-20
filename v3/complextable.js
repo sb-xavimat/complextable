@@ -37,21 +37,21 @@ var Gradebook = (function () {
      * @param {string} [options.elements.footerInfo] - ID of the footer info span (optional)
      */
     function Gradebook(options) {
-    this.config = options.config;
-    this.headerRows = options.headerRows;
-    this.bodyRows = options.bodyRows;
-    this.cellClasses = options.cellClasses || {};
-    this.els = options.elements;
+        this.config = options.config;
+        this.headerRows = options.headerRows;
+        this.groups = options.groups;
+        this.cellClasses = options.cellClasses || {};
+        this.els = options.elements;
     }
 
     /**
      * Render the full table (headers + body) and set up scroll sync.
      */
     Gradebook.prototype.render = function () {
-    this._buildHead();
-    this._buildBody();
-    this._setupScrollSync();
-    this._updateFooter();
+        this._buildHead();
+        this._buildBody();
+        this._setupScrollSync();
+        this._updateFooter();
     };
 
     /* ----------------------------------------------------------
@@ -62,30 +62,30 @@ var Gradebook = (function () {
         and no runtime DOM measurement is required.
     ---------------------------------------------------------- */
     Gradebook.prototype._calcHeaderGeometry = function () {
-    var topOffsets = [];
-    var heightValues = [];
-    var cumulativeParts = [];
+        var topOffsets = [];
+        var heightValues = [];
+        var cumulativeParts = [];
 
-    for (var r = 0; r < this.config.topRows.length; r++) {
-        var rowConfig = this.config.topRows[r];
-        var heightVar = (rowConfig.lines === 1)
-        ? 'var(--row-height-1line)'
-        : 'var(--row-height-2lines)';
+        for (var r = 0; r < this.config.topRows.length; r++) {
+            var rowConfig = this.config.topRows[r];
+            var heightVar = (rowConfig.lines === 1)
+                ? 'var(--row-height-1line)'
+                : 'var(--row-height-2lines)';
 
-        heightValues.push(heightVar);
+            heightValues.push(heightVar);
 
-        if (r === 0) {
-        topOffsets.push('0px');
-        } else if (cumulativeParts.length === 1) {
-        topOffsets.push(cumulativeParts[0]);
-        } else {
-        topOffsets.push('calc(' + cumulativeParts.join(' + ') + ')');
+            if (r === 0) {
+                topOffsets.push('0px');
+            } else if (cumulativeParts.length === 1) {
+                topOffsets.push(cumulativeParts[0]);
+            } else {
+                topOffsets.push('calc(' + cumulativeParts.join(' + ') + ')');
+            }
+
+            cumulativeParts.push(heightVar);
         }
 
-        cumulativeParts.push(heightVar);
-    }
-
-    return { topOffsets: topOffsets, heightValues: heightValues };
+        return { topOffsets: topOffsets, heightValues: heightValues };
     };
 
     /* ----------------------------------------------------------
@@ -98,114 +98,150 @@ var Gradebook = (function () {
         - Class `sticky-right` + inline `right` offset if it's a fixed-right column
     ---------------------------------------------------------- */
     Gradebook.prototype._buildHead = function () {
-    var thead = document.getElementById(this.els.thead);
-    var totalCols = this.headerRows[0].length;
-    var fixedRight = this.config.fixedRightCols;
-    var firstFixedRightIndex = totalCols - fixedRight;
-    var geo = this._calcHeaderGeometry();
+        var thead = document.getElementById(this.els.thead);
+        var totalCols = this.headerRows[0].length;
+        var fixedRight = this.config.fixedRightCols;
+        var firstFixedRightIndex = totalCols - fixedRight;
+        var geo = this._calcHeaderGeometry();
 
-    for (var r = 0; r < this.config.topRows.length; r++) {
+        for (var r = 0; r < this.config.topRows.length; r++) {
+            var tr = document.createElement('tr');
+
+            for (var c = 0; c < totalCols; c++) {
+                var th = document.createElement('th');
+                var label = this.headerRows[r][c] || '';
+
+                // Multi-line content (e.g. "\n" in sub-header rows)
+                if (label.indexOf('\n') !== -1) {
+                    th.innerHTML = label.replace('\n', '<br>');
+                    if (r > 0) th.classList.add('sub-header');
+                } else {
+                    th.textContent = label;
+                    if (r > 0) th.classList.add('sub-header');
+                }
+
+                // Sticky top: inline CSS variable math
+                th.style.top = geo.topOffsets[r];
+                th.style.height = geo.heightValues[r];
+
+                // Sticky left: column 0
+                if (c === 0) {
+                    th.classList.add('sticky-left');
+                }
+
+                // Sticky right: last N columns
+                if (c >= firstFixedRightIndex) {
+                    th.classList.add('sticky-right');
+                    var posFromRight = (totalCols - 1) - c;
+                    th.style.right = (posFromRight === 0)
+                        ? '0px'
+                        : 'calc(var(--col-width-default) * ' + posFromRight + ')';
+                }
+
+                // Fixed width for non-name columns
+                if (c !== 0) {
+                    th.style.width = 'var(--col-width-default)';
+                    th.style.minWidth = 'var(--col-width-default)';
+                    th.style.maxWidth = 'var(--col-width-default)';
+                }
+
+                tr.appendChild(th);
+            }
+
+            thead.appendChild(tr);
+        }
+    };
+
+    /* ----------------------------------------------------------
+        PRIVATE: Create a single <tr> from row data.
+
+        @param {Array}  rowData    - Cell values for each column
+        @param {string} [cssClass] - Optional CSS class to add to the <tr>
+        @returns {HTMLTableRowElement}
+    ---------------------------------------------------------- */
+    Gradebook.prototype._makeDataRow = function (rowData, cssClass) {
+        var totalCols = this.headerRows[0].length;
+        var fixedRight = this.config.fixedRightCols;
+        var firstFixedRightIndex = totalCols - fixedRight;
+
         var tr = document.createElement('tr');
+        if (cssClass) { tr.classList.add(cssClass); }
 
         for (var c = 0; c < totalCols; c++) {
-        var th = document.createElement('th');
-        var label = this.headerRows[r][c] || '';
+            var td = document.createElement('td');
+            var val = rowData[c];
+            td.textContent = (val !== undefined && val !== null) ? val : '';
 
-        // Multi-line content (e.g. "\n" in sub-header rows)
-        if (label.indexOf('\n') !== -1) {
-            th.innerHTML = label.replace('\n', '<br>');
-            if (r > 0) th.classList.add('sub-header');
-        } else {
-            th.textContent = label;
-            if (r > 0) th.classList.add('sub-header');
+            // Sticky left: column 0
+            if (c === 0) {
+                td.classList.add('sticky-left');
+            }
+
+            // Apply per-column CSS classes (e.g., 'score-cell', 'grade-cell')
+            if (this.cellClasses[c]) {
+                td.classList.add(this.cellClasses[c]);
+            }
+
+            // Sticky right columns
+            if (c >= firstFixedRightIndex) {
+                td.classList.add('sticky-right');
+                var posFromRight = (totalCols - 1) - c;
+                td.style.right = (posFromRight === 0)
+                    ? '0px'
+                    : 'calc(var(--col-width-default) * ' + posFromRight + ')';
+            }
+
+            // Fixed width for non-name columns
+            if (c !== 0) {
+                td.style.width = 'var(--col-width-default)';
+                td.style.minWidth = 'var(--col-width-default)';
+                td.style.maxWidth = 'var(--col-width-default)';
+            }
+
+            tr.appendChild(td);
         }
 
-        // Sticky top: inline CSS variable math
-        th.style.top = geo.topOffsets[r];
-        th.style.height = geo.heightValues[r];
-
-        // Sticky left: column 0
-        if (c === 0) {
-            th.classList.add('sticky-left');
-        }
-
-        // Sticky right: last N columns
-        if (c >= firstFixedRightIndex) {
-            th.classList.add('sticky-right');
-            var posFromRight = (totalCols - 1) - c;
-            th.style.right = (posFromRight === 0)
-            ? '0px'
-            : 'calc(var(--col-width-default) * ' + posFromRight + ')';
-        }
-
-        // Fixed width for non-name columns
-        if (c !== 0) {
-            th.style.width = 'var(--col-width-default)';
-            th.style.minWidth = 'var(--col-width-default)';
-            th.style.maxWidth = 'var(--col-width-default)';
-        }
-
-        tr.appendChild(th);
-        }
-
-        thead.appendChild(tr);
-    }
+        return tr;
     };
 
     /* ----------------------------------------------------------
         PRIVATE: Build <tbody> rows.
+
+        Each group object has { name, rows, averagesRow }. Renders a
+        group-name row, student rows, and an averages row per group.
 
         Uses a DocumentFragment for performance — appending all rows
         in one batch. Each <td> gets the same sticky-left/right logic
         as the header, plus optional CSS classes from this.cellClasses.
     ---------------------------------------------------------- */
     Gradebook.prototype._buildBody = function () {
-    var tbody = document.getElementById(this.els.tbody);
-    var totalCols = this.headerRows[0].length;
-    var fixedRight = this.config.fixedRightCols;
-    var firstFixedRightIndex = totalCols - fixedRight;
-    var fragment = document.createDocumentFragment();
+        var tbody = document.getElementById(this.els.tbody);
+        var totalCols = this.headerRows[0].length;
+        var fragment = document.createDocumentFragment();
+        var g, r, i, group, nameData;
 
-    for (var r = 0; r < this.bodyRows.length; r++) {
-        var tr = document.createElement('tr');
+        for (g = 0; g < this.groups.length; g++) {
+            group = this.groups[g];
 
-        for (var c = 0; c < totalCols; c++) {
-        var td = document.createElement('td');
-        td.textContent = this.bodyRows[r][c];
+            // Group name row: label in col 0, empty elsewhere
+            nameData = [];
+            for (i = 0; i < totalCols; i++) {
+                nameData.push(i === 0 ? group.name : '');
+            }
+            fragment.appendChild(this._makeDataRow(nameData, 'group-name-row'));
 
-        // Sticky left: column 0
-        if (c === 0) {
-            td.classList.add('sticky-left');
+            // Student rows
+            for (r = 0; r < group.rows.length; r++) {
+                fragment.appendChild(this._makeDataRow(group.rows[r]));
+            }
+
+            // Group averages row
+            if (group.averagesRow) {
+                fragment.appendChild(this._makeDataRow(group.averagesRow, 'group-averages-row'));
+            }
         }
 
-        // Apply per-column CSS classes (e.g., 'score-cell', 'grade-cell')
-        if (this.cellClasses[c]) {
-            td.classList.add(this.cellClasses[c]);
-        }
-
-        // Sticky right columns
-        if (c >= firstFixedRightIndex) {
-            td.classList.add('sticky-right');
-            var posFromRight = (totalCols - 1) - c;
-            td.style.right = (posFromRight === 0)
-            ? '0px'
-            : 'calc(var(--col-width-default) * ' + posFromRight + ')';
-        }
-
-        // Fixed width for non-name columns
-        if (c !== 0) {
-            td.style.width = 'var(--col-width-default)';
-            td.style.minWidth = 'var(--col-width-default)';
-            td.style.maxWidth = 'var(--col-width-default)';
-        }
-
-        tr.appendChild(td);
-        }
-
-        fragment.appendChild(tr);
-    }
-
-    tbody.appendChild(fragment);
+        tbody.appendChild(fragment);
     };
 
     /* ----------------------------------------------------------
@@ -218,59 +254,63 @@ var Gradebook = (function () {
         A shared `isSyncing` flag breaks the loop.
     ---------------------------------------------------------- */
     Gradebook.prototype._setupScrollSync = function () {
-    var topScrollbar = document.getElementById(this.els.topScrollbar);
-    var tableContainer = document.getElementById(this.els.tableContainer);
-    var topDummy = document.getElementById(this.els.topDummy);
-    var table = document.getElementById(this.els.table);
+        var topScrollbar = document.getElementById(this.els.topScrollbar);
+        var tableContainer = document.getElementById(this.els.tableContainer);
+        var topDummy = document.getElementById(this.els.topDummy);
+        var table = document.getElementById(this.els.table);
 
-    var isSyncing = false;
+        var isSyncing = false;
 
-    // ResizeObserver: keep the dummy div width in sync with the table's scrollWidth
-    var resizeObserver = new ResizeObserver(function () {
-        topDummy.style.width = table.scrollWidth + 'px';
-        adjustTableContainerHeight();
-    });
-    resizeObserver.observe(table);
+        // ResizeObserver: keep the dummy div width in sync with the table's scrollWidth
+        var resizeObserver = new ResizeObserver(function () {
+            topDummy.style.width = table.scrollWidth + 'px';
+            adjustTableContainerHeight();
+        });
+        resizeObserver.observe(table);
 
-    // Sync: Top Scrollbar → Table Container
-    topScrollbar.addEventListener('scroll', function () {
-        if (isSyncing) { isSyncing = false; return; }
-        isSyncing = true;
-        tableContainer.scrollLeft = topScrollbar.scrollLeft;
-    });
+        // Sync: Top Scrollbar → Table Container
+        topScrollbar.addEventListener('scroll', function () {
+            if (isSyncing) { isSyncing = false; return; }
+            isSyncing = true;
+            tableContainer.scrollLeft = topScrollbar.scrollLeft;
+        });
 
-    // Sync: Table Container → Top Scrollbar
-    tableContainer.addEventListener('scroll', function () {
-        if (isSyncing) { isSyncing = false; return; }
-        isSyncing = true;
-        topScrollbar.scrollLeft = tableContainer.scrollLeft;
-    });
+        // Sync: Table Container → Top Scrollbar
+        tableContainer.addEventListener('scroll', function () {
+            if (isSyncing) { isSyncing = false; return; }
+            isSyncing = true;
+            topScrollbar.scrollLeft = tableContainer.scrollLeft;
+        });
 
-    // Dynamically adjust .table-container height to avoid clipping last row when no horizontal scrollbar
-    function adjustTableContainerHeight() {
-        if (!containerOrTableReady()) return;
-        if (table.scrollWidth > tableContainer.clientWidth) {
-            tableContainer.style.height = 'calc(100% + 15px)';
-        } else {
-            tableContainer.style.height = '100%';
+        // Dynamically adjust .table-container height to avoid clipping last row when no horizontal scrollbar
+        function adjustTableContainerHeight() {
+            if (!containerOrTableReady()) return;
+            if (table.scrollWidth > tableContainer.clientWidth) {
+                tableContainer.style.height = 'calc(100% + 15px)';
+            } else {
+                tableContainer.style.height = '100%';
+            }
         }
-    }
-    function containerOrTableReady() {
-        return tableContainer && table;
-    }
-    window.addEventListener('resize', adjustTableContainerHeight);
-    setTimeout(adjustTableContainerHeight, 0);
+        function containerOrTableReady() {
+            return tableContainer && table;
+        }
+        window.addEventListener('resize', adjustTableContainerHeight);
+        setTimeout(adjustTableContainerHeight, 0);
     };
 
     /* ----------------------------------------------------------
         PRIVATE: Update footer with row/column counts (optional).
     ---------------------------------------------------------- */
     Gradebook.prototype._updateFooter = function () {
-    if (!this.els.footerInfo) return;
-    var el = document.getElementById(this.els.footerInfo);
-    if (!el) return;
-    var totalCols = this.headerRows[0].length;
-    el.textContent = this.bodyRows.length + ' Students \u2022 ' + totalCols + ' Columns';
+        if (!this.els.footerInfo) return;
+        var el = document.getElementById(this.els.footerInfo);
+        if (!el) return;
+        var totalCols = this.headerRows[0].length;
+        var studentCount = 0;
+        for (var g = 0; g < this.groups.length; g++) {
+            studentCount += this.groups[g].rows.length;
+        }
+        el.textContent = studentCount + ' Students \u2022 ' + totalCols + ' Columns';
     };
 
     return Gradebook;
