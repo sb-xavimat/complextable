@@ -67,10 +67,10 @@
       /* ==============================================================
          CONFIGURATION
          ============================================================== */
-      var TOTAL_COLS = 15;        // 1 name + 12 assignments + 1 average + 1 grade
-      var NUM_ASSIGNMENTS = TOTAL_COLS - 3; // 12
+      const TOTAL_COLS = 15;        // 1 name + 12 assignments + 1 average + 1 grade
+      const NUM_ASSIGNMENTS = TOTAL_COLS - 3; // 12
 
-      var GROUPS_CONFIG = [
+      const GROUPS_CONFIG = [
         { name: 'Class 1A', size: 8  },
         { name: 'Class 1B', size: 10 },
         { name: 'Class 2A', size: 7  },
@@ -79,9 +79,9 @@
       /* ==============================================================
          NAME POOLS
          ============================================================== */
-      var FIRST_NAMES = [
+      const FIRST_NAMES = [
         'Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason',
-        'Isabella', 'William William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia',
+        'Isabella', 'William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia',
         'Lucas', 'Harper', 'Henry', 'Evelyn', 'Alexander', 'Abigail', 'Michael',
         'Emily', 'Daniel', 'Elizabeth', 'Jacob', 'Sofia', 'Logan', 'Avery',
         'Jackson', 'Ella', 'Sebastian', 'Scarlett', 'Aiden', 'Grace', 'Matthew',
@@ -90,7 +90,7 @@
         'Layla'
       ];
 
-      var LAST_NAMES = [
+      const LAST_NAMES = [
         'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller',
         'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez',
         'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
@@ -101,20 +101,20 @@
         'Carter', 'Roberts'
       ];
 
-      var MONTHS = [
-        'Sep', 'Sep', 'Sep', 'Oct', 'Oct', 'Oct', 'Nov', 'Nov',
-        'Nov', 'Dec', 'Dec', 'Jan', 'Jan', 'Feb', 'Feb', 'Feb',
-        'Mar', 'Mar', 'Mar', 'Apr', 'Apr', 'Apr', 'May'
-      ];
+      // const MONTHS = [
+      //   'Sep', 'Sep', 'Sep', 'Oct', 'Oct', 'Oct', 'Nov', 'Nov',
+      //   'Nov', 'Dec', 'Dec', 'Jan', 'Jan', 'Feb', 'Feb', 'Feb',
+      //   'Mar', 'Mar', 'Mar', 'Apr', 'Apr', 'Apr', 'May'
+      // ];
 
       /* ==============================================================
          HELPER FUNCTIONS
          ============================================================== */
 
       function generateStudentName(index) {
-        var first = FIRST_NAMES[index % FIRST_NAMES.length];
-        var last = LAST_NAMES[index % LAST_NAMES.length];
-        var cycle = Math.floor(index / FIRST_NAMES.length);
+        const first = FIRST_NAMES[index % FIRST_NAMES.length];
+        const last = LAST_NAMES[index % LAST_NAMES.length];
+        const cycle = Math.floor(index / FIRST_NAMES.length);
         if (cycle > 0) {
           return last + ', ' + first + ' ' + String.fromCharCode(65 + cycle);
         }
@@ -129,9 +129,9 @@
          GENERATE HEADER ROWS
          ============================================================== */
       function generateHeaders1() {
-        var row1 = [''];
+        const row1 = [''];
 
-        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
+        for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
           row1.push('Asgn ' + (a + 1));
         }
 
@@ -141,44 +141,44 @@
         return [row1];
       }
 
-      function generateHeaders2() {
-        var row1 = [''];
-        var row2 = [''];
+      // function generateHeaders2() {
+      //   const row1 = [''];
+      //   const row2 = [''];
 
-        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
-          row1.push('Asgn ' + (a + 1));
-          var month = MONTHS[a % MONTHS.length];
-          var day = randomInt(1, 28);
-          row2.push(month + ' ' + day + '\n100 pts');
-        }
+      //   for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
+      //     row1.push('Asgn ' + (a + 1));
+      //     const month = MONTHS[a % MONTHS.length];
+      //     const day = randomInt(1, 28);
+      //     row2.push(month + ' ' + day + '\n100 pts');
+      //   }
 
-        row1.push('Average');
-        row2.push('Weighted');
-        row1.push('Weighted Average');
-        row2.push('Letter Grade');
+      //   row1.push('Average');
+      //   row2.push('Weighted');
+      //   row1.push('Weighted Average');
+      //   row2.push('Letter Grade');
 
-        return [row1, row2];
-      }
+      //   return [row1, row2];
+      // }
 
       /* ==============================================================
          GENERATE A SINGLE STUDENT ROW
          ============================================================== */
       function generateStudentRow(index) {
-        var row = [];
+        const row = [];
         row.push(generateStudentName(index));
 
-        var sum = 0;
-        for (var a = 0; a < NUM_ASSIGNMENTS; a++) {
-          var score = randomInt(45, 100);
+        let sum = 0;
+        for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
+          const score = randomInt(45, 100);
           row.push(score);
           sum += score;
         }
 
-        var avg = (sum / NUM_ASSIGNMENTS).toFixed(1);
+        const avg = (sum / NUM_ASSIGNMENTS).toFixed(1);
         row.push(avg);
 
-        var avgNum = parseFloat(avg);
-        var grade;
+        const avgNum = parseFloat(avg);
+        let grade;
         if (avgNum >= 90)      grade = 'A';
         else if (avgNum >= 80) grade = 'B';
         else if (avgNum >= 70) grade = 'C';
@@ -195,25 +195,25 @@
          group, then computes the overall average and letter grade.
          ============================================================== */
       function computeGroupAveragesRow(groupRows) {
-        var row = ['Group Average'];
-        var r, a, colSum, groupAvg, grade;
+        const row = ['Group Average'];
+        let r, a, grade;
 
         // Average for each assignment column (cols 1 … NUM_ASSIGNMENTS)
-        for (a = 0; a < NUM_ASSIGNMENTS; a++) {
-          colSum = 0;
-          for (r = 0; r < groupRows.length; r++) {
+        for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
+          let colSum = 0;
+          for (let r = 0; r < groupRows.length; r++) {
             colSum += parseFloat(groupRows[r][1 + a]) || 0;
           }
           row.push((colSum / groupRows.length).toFixed(1));
         }
 
         // Overall average (mean of student averages in col NUM_ASSIGNMENTS + 1)
-        var avgColIndex = 1 + NUM_ASSIGNMENTS;
-        colSum = 0;
-        for (r = 0; r < groupRows.length; r++) {
+        const avgColIndex = 1 + NUM_ASSIGNMENTS;
+        let colSum = 0;
+        for (let r = 0; r < groupRows.length; r++) {
           colSum += parseFloat(groupRows[r][avgColIndex]) || 0;
         }
-        groupAvg = colSum / groupRows.length;
+        const groupAvg = colSum / groupRows.length;
         row.push(groupAvg.toFixed(1));
 
         if (groupAvg >= 90)      grade = 'A';
@@ -230,14 +230,14 @@
          GENERATE ALL GROUPS
          ============================================================== */
       function generateGroups() {
-        var groups = [];
-        var studentIndex = 0;
+        const groups = [];
+        let studentIndex = 0;
 
-        for (var g = 0; g < GROUPS_CONFIG.length; g++) {
-          var cfg = GROUPS_CONFIG[g];
-          var rows = [];
+        for (let g = 0; g < GROUPS_CONFIG.length; g++) {
+          const cfg = GROUPS_CONFIG[g];
+          const rows = [];
 
-          for (var s = 0; s < cfg.size; s++) {
+          for (let s = 0; s < cfg.size; s++) {
             rows.push(generateStudentRow(studentIndex));
             studentIndex++;
           }
@@ -257,11 +257,11 @@
          Per-column CSS classes for body cells.
          ============================================================== */
       function buildCellClasses() {
-        var classes = {};
-        var firstFixedRight = TOTAL_COLS - 2; // index 23
+        const classes = {};
+        const firstFixedRight = TOTAL_COLS - 2; // index 23
 
         // Assignment score columns: center-align
-        for (var c = 1; c < firstFixedRight; c++) {
+        for (let c = 1; c < firstFixedRight; c++) {
           classes[c] = 'score-cell';
         }
         // Average column: center-align
@@ -275,7 +275,7 @@
       /* ==============================================================
          INITIALIZATION — Create and render the Gradebook
          ============================================================== */
-      var gradebook = new Gradebook({
+      const gradebook = new Gradebook({
         config: {
           topRows: [
             { lines: 2 },  // Row 0: Main column headers (single line)

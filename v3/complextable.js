@@ -15,7 +15,7 @@
  *
  * All sticky offsets are built from CSS variable math — no DOM measurement.
  */
-var Gradebook = (function () {
+const Gradebook = (function () {
     'use strict';
 
     /**
@@ -63,13 +63,13 @@ var Gradebook = (function () {
         and no runtime DOM measurement is required.
     ---------------------------------------------------------- */
     Gradebook.prototype._calcHeaderGeometry = function () {
-        var topOffsets = [];
-        var heightValues = [];
-        var cumulativeParts = [];
+        const topOffsets = [];
+        const heightValues = [];
+        const cumulativeParts = [];
 
-        for (var r = 0; r < this.config.topRows.length; r++) {
-            var rowConfig = this.config.topRows[r];
-            var heightVar = (rowConfig.lines === 1)
+        for (let r = 0; r < this.config.topRows.length; r++) {
+            const rowConfig = this.config.topRows[r];
+            const heightVar = (rowConfig.lines === 1)
                 ? 'var(--row-height-1line)'
                 : 'var(--row-height-2lines)';
 
@@ -99,18 +99,18 @@ var Gradebook = (function () {
         - Class `sticky-right` + inline `right` offset if it's a fixed-right column
     ---------------------------------------------------------- */
     Gradebook.prototype._buildHead = function () {
-        var thead = document.getElementById(this.els.thead);
-        var totalCols = this.headerRows[0].length;
-        var fixedRight = this.config.fixedRightCols;
-        var firstFixedRightIndex = totalCols - fixedRight;
-        var geo = this._calcHeaderGeometry();
+        const thead = document.getElementById(this.els.thead);
+        const totalCols = this.headerRows[0].length;
+        const fixedRight = this.config.fixedRightCols;
+        const firstFixedRightIndex = totalCols - fixedRight;
+        const geo = this._calcHeaderGeometry();
 
-        for (var r = 0; r < this.config.topRows.length; r++) {
-            var tr = document.createElement('tr');
+        for (let r = 0; r < this.config.topRows.length; r++) {
+            const tr = document.createElement('tr');
 
-            for (var c = 0; c < totalCols; c++) {
-                var th = document.createElement('th');
-                var label = this.headerRows[r][c] || '';
+            for (let c = 0; c < totalCols; c++) {
+                const th = document.createElement('th');
+                const label = this.headerRows[r][c] || '';
 
                 // Multi-line content (e.g. "\n" in sub-header rows)
                 if (label.indexOf('\n') !== -1) {
@@ -133,7 +133,7 @@ var Gradebook = (function () {
                 // Sticky right: last N columns
                 if (c >= firstFixedRightIndex) {
                     th.classList.add('sticky-right');
-                    var posFromRight = (totalCols - 1) - c;
+                    const posFromRight = (totalCols - 1) - c;
                     th.style.right = (posFromRight === 0)
                         ? '0px'
                         : 'calc(var(--col-width-default) * ' + posFromRight + ')';
@@ -161,16 +161,16 @@ var Gradebook = (function () {
         @returns {HTMLTableRowElement}
     ---------------------------------------------------------- */
     Gradebook.prototype._makeDataRow = function (rowData, cssClass) {
-        var totalCols = this.headerRows[0].length;
-        var fixedRight = this.config.fixedRightCols;
-        var firstFixedRightIndex = totalCols - fixedRight;
+        const totalCols = this.headerRows[0].length;
+        const fixedRight = this.config.fixedRightCols;
+        const firstFixedRightIndex = totalCols - fixedRight;
 
-        var tr = document.createElement('tr');
+        const tr = document.createElement('tr');
         if (cssClass) { tr.classList.add(cssClass); }
 
-        for (var c = 0; c < totalCols; c++) {
-            var td = document.createElement('td');
-            var val = rowData[c];
+        for (let c = 0; c < totalCols; c++) {
+            const td = document.createElement('td');
+            const val = rowData[c];
             td.textContent = (val !== undefined && val !== null) ? val : '';
 
             // Sticky left: column 0
@@ -185,14 +185,14 @@ var Gradebook = (function () {
 
             // Apply value-based CSS class via callback
             if (this.cellClassFn) {
-                var extra = this.cellClassFn(c, val);
+                const extra = this.cellClassFn(c, val);
                 if (extra) td.classList.add(extra);
             }
 
             // Sticky right columns
             if (c >= firstFixedRightIndex) {
                 td.classList.add('sticky-right');
-                var posFromRight = (totalCols - 1) - c;
+                const posFromRight = (totalCols - 1) - c;
                 td.style.right = (posFromRight === 0)
                     ? '0px'
                     : 'calc(var(--col-width-default) * ' + posFromRight + ')';
@@ -222,30 +222,30 @@ var Gradebook = (function () {
         as the header, plus optional CSS classes from this.cellClasses.
     ---------------------------------------------------------- */
     Gradebook.prototype._buildBody = function () {
-        var tbody = document.getElementById(this.els.tbody);
-        var totalCols = this.headerRows[0].length;
-        var fragment = document.createDocumentFragment();
-        var g, r, i, group, nameData;
+        const tbody = document.getElementById(this.els.tbody);
+        const totalCols = this.headerRows[0].length;
+        const fragment = document.createDocumentFragment();
+        let g, r, i, group, nameData;
 
         this._groupElements = [];
 
-        for (g = 0; g < this.groups.length; g++) {
+        for (let g = 0; g < this.groups.length; g++) {
             group = this.groups[g];
 
             // Group name row: toggle button + label in col 0, empty elsewhere
             nameData = [];
-            for (i = 0; i < totalCols; i++) {
+            for (let i = 0; i < totalCols; i++) {
                 nameData.push(i === 0 ? group.name : '');
             }
-            var nameRow = this._makeDataRow(nameData, 'group-name-row');
+            const nameRow = this._makeDataRow(nameData, 'group-name-row');
 
-            var firstCell = nameRow.querySelector('td.sticky-left');
+            const firstCell = nameRow.querySelector('td.sticky-left');
             if (firstCell) {
-                var btn = document.createElement('button');
+                const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'group-toggle-btn';
                 btn.setAttribute('data-group', g);
-                var img = document.createElement('img');
+                const img = document.createElement('img');
                 img.src = '../imgs/expand_close.svg';
                 img.alt = 'Toggle group';
                 btn.appendChild(img);
@@ -254,9 +254,9 @@ var Gradebook = (function () {
             fragment.appendChild(nameRow);
 
             // Student rows
-            var contentRows = [];
-            for (r = 0; r < group.rows.length; r++) {
-                var row = this._makeDataRow(group.rows[r]);
+            const contentRows = [];
+            for (let r = 0; r < group.rows.length; r++) {
+                const row = this._makeDataRow(group.rows[r]);
                 fragment.appendChild(row);
                 contentRows.push(row);
             }
@@ -287,12 +287,12 @@ var Gradebook = (function () {
         A shared `isSyncing` flag breaks the loop.
     ---------------------------------------------------------- */
     Gradebook.prototype._setupScrollSync = function () {
-        var topScrollbar = document.getElementById(this.els.topScrollbar);
-        var tableContainer = document.getElementById(this.els.tableContainer);
-        var topDummy = document.getElementById(this.els.topDummy);
-        var table = document.getElementById(this.els.table);
+        const topScrollbar = document.getElementById(this.els.topScrollbar);
+        const tableContainer = document.getElementById(this.els.tableContainer);
+        const topDummy = document.getElementById(this.els.topDummy);
+        const table = document.getElementById(this.els.table);
 
-        var isSyncing = false;
+        let isSyncing = false;
 
         // ResizeObserver: keep the dummy div width in sync with the table's scrollWidth,
         // accounting for the vertical scrollbar width (difference between
@@ -300,7 +300,7 @@ var Gradebook = (function () {
         function updateDummyWidth() {
             topDummy.style.width = (table.scrollWidth - tableContainer.clientWidth + topScrollbar.clientWidth) + 'px';
         }
-        var resizeObserver = new ResizeObserver(function () {
+        const resizeObserver = new ResizeObserver(function () {
             updateDummyWidth();
             adjustTableContainerHeight();
         });
@@ -341,11 +341,11 @@ var Gradebook = (function () {
         PRIVATE: Attach click handlers to all group toggle buttons.
     ---------------------------------------------------------- */
     Gradebook.prototype._setupGroupToggles = function () {
-        var self = this;
-        var buttons = document.querySelectorAll('.group-toggle-btn');
-        for (var i = 0; i < buttons.length; i++) {
+        const self = this;
+        const buttons = document.querySelectorAll('.group-toggle-btn');
+        for (let i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener('click', function () {
-                var groupIndex = parseInt(this.getAttribute('data-group'), 10);
+                const groupIndex = parseInt(this.getAttribute('data-group'), 10);
                 self._toggleGroup(groupIndex);
             });
         }
@@ -356,14 +356,14 @@ var Gradebook = (function () {
         Hides/shows student and averages rows, swaps SVG icon.
     ---------------------------------------------------------- */
     Gradebook.prototype._toggleGroup = function (groupIndex) {
-        var groupData = this._groupElements[groupIndex];
+        const groupData = this._groupElements[groupIndex];
         if (!groupData) return;
 
         groupData.collapsed = !groupData.collapsed;
 
-        var img = groupData.nameRow.querySelector('.group-toggle-btn img');
+        const img = groupData.nameRow.querySelector('.group-toggle-btn img');
 
-        for (var i = 0; i < groupData.contentRows.length; i++) {
+        for (let i = 0; i < groupData.contentRows.length; i++) {
             groupData.contentRows[i].style.display = groupData.collapsed ? 'none' : '';
         }
 
@@ -377,11 +377,11 @@ var Gradebook = (function () {
     ---------------------------------------------------------- */
     Gradebook.prototype._updateFooter = function () {
         if (!this.els.footerInfo) return;
-        var el = document.getElementById(this.els.footerInfo);
+        const el = document.getElementById(this.els.footerInfo);
         if (!el) return;
-        var totalCols = this.headerRows[0].length;
-        var studentCount = 0;
-        for (var g = 0; g < this.groups.length; g++) {
+        const totalCols = this.headerRows[0].length;
+        let studentCount = 0;
+        for (let g = 0; g < this.groups.length; g++) {
             studentCount += this.groups[g].rows.length;
         }
         el.textContent = studentCount + ' Students \u2022 ' + totalCols + ' Columns';
