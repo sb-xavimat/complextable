@@ -42,9 +42,9 @@
 
     /* ---- Cosmetic: Colors ---- */
     --color-bg: #ffffff;
-    --color-header-bg: #7a8086;
+    --color-header-bg: #4e555d;
     --color-hscroll-bg: #f7f8fa;
-    --color-th-bg: #7a8086;
+    --color-th-bg: #4e555d;
     --color-border: #ffffff;
     --color-border-footer: #aba8a8;
     --color-text: #333333;
@@ -59,8 +59,8 @@
     --color-row-altodd: #e9e9e9;
     --color-row-altodd-sticky-left: #e9e9e9;
     --color-row-altodd-sticky-right: #e9e9e9;
-    --color-header-text: #ffffff;
-    --color-th-text: #ffffff;
+    --color-text-header: #ffffff;
+    --color-text-th: #ffffff;
     --color-footer-bg: #ffffff;
     --color-scrollbar-track: #f1f1f1;
     --color-scrollbar-thumb: #b0b0b0;
@@ -134,7 +134,7 @@ header {
 
 header h1 {
     font-size: var(--font-size-title);
-    color: var(--color-header-text);
+    color: var(--color-text-header);
     font-weight: 600;
 }
 
@@ -255,7 +255,7 @@ th, td {
 th {
     font-size: var(--font-size-header);
     font-weight: 400;
-    color: var(--color-th-text);
+    color: var(--color-text-th);
     background: var(--color-th-bg);
     text-align: center;
 }
@@ -370,7 +370,7 @@ tbody tr:nth-child(odd) td.sticky-right {
 /* Sub-header row styling (smaller, lighter text with tighter line-height) */
 .sub-header {
     font-weight: 400;
-    color: var(--color-text-light);
+    color: var(--color-text-header);
     font-size: var(--font-size-small);
     line-height: 1.3;
 }

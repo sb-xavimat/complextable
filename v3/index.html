@@ -132,7 +132,7 @@
         const row1 = [''];
 
         for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
-          row1.push('Asgn ' + (a + 1));
+          row1.push('Unidad ' + (a + 1));
         }
 
         row1.push('Average');
@@ -279,11 +279,11 @@
         config: {
           topRows: [
             { lines: 2 },  // Row 0: Main column headers (single line)
-            { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
+            // { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
           ],
           fixedRightCols: 2
         },
-        headerRows: generateHeaders2(),
+        headerRows: generateHeaders1(),
         groups: generateGroups(),
         cellClasses: buildCellClasses(),
         cellClassFn: function (col, val) {
