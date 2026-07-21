@@ -139,8 +139,8 @@ const Gradebook = (function () {
                         : 'calc(var(--col-width-default) * ' + posFromRight + ')';
                 }
 
-                // Fixed width for non-name columns
-                if (c !== 0) {
+                // Fixed width for sticky-right columns only
+                if (c >= firstFixedRightIndex) {
                     th.style.width = 'var(--col-width-default)';
                     th.style.minWidth = 'var(--col-width-default)';
                     th.style.maxWidth = 'var(--col-width-default)';
@@ -198,8 +198,8 @@ const Gradebook = (function () {
                     : 'calc(var(--col-width-default) * ' + posFromRight + ')';
             }
 
-            // Fixed width for non-name columns
-            if (c !== 0) {
+            // Fixed width for sticky-right columns only
+            if (c >= firstFixedRightIndex) {
                 td.style.width = 'var(--col-width-default)';
                 td.style.minWidth = 'var(--col-width-default)';
                 td.style.maxWidth = 'var(--col-width-default)';

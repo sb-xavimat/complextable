@@ -101,11 +101,11 @@
         'Carter', 'Roberts'
       ];
 
-      // const MONTHS = [
-      //   'Sep', 'Sep', 'Sep', 'Oct', 'Oct', 'Oct', 'Nov', 'Nov',
-      //   'Nov', 'Dec', 'Dec', 'Jan', 'Jan', 'Feb', 'Feb', 'Feb',
-      //   'Mar', 'Mar', 'Mar', 'Apr', 'Apr', 'Apr', 'May'
-      // ];
+      const MONTHS = [
+        'Sep', 'Sep', 'Sep', 'Oct', 'Oct', 'Oct', 'Nov', 'Nov',
+        'Nov', 'Dec', 'Dec', 'Jan', 'Jan', 'Feb', 'Feb', 'Feb',
+        'Mar', 'Mar', 'Mar', 'Apr', 'Apr', 'Apr', 'May'
+      ];
 
       /* ==============================================================
          HELPER FUNCTIONS
@@ -141,24 +141,24 @@
         return [row1];
       }
 
-      // function generateHeaders2() {
-      //   const row1 = [''];
-      //   const row2 = [''];
+      function generateHeaders2() {
+        const row1 = [''];
+        const row2 = [''];
 
-      //   for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
-      //     row1.push('Asgn ' + (a + 1));
-      //     const month = MONTHS[a % MONTHS.length];
-      //     const day = randomInt(1, 28);
-      //     row2.push(month + ' ' + day + '\n100 pts');
-      //   }
+        for (let a = 0; a < NUM_ASSIGNMENTS; a++) {
+          row1.push('Asgn ' + (a + 1));
+          const month = MONTHS[a % MONTHS.length];
+          const day = randomInt(1, 28);
+          row2.push(month + ' ' + day + '\n100 pts');
+        }
 
-      //   row1.push('Average');
-      //   row2.push('Weighted');
-      //   row1.push('Weighted Average');
-      //   row2.push('Letter Grade');
+        row1.push('Average');
+        row2.push('Weighted');
+        row1.push('Weighted Average');
+        row2.push('Letter Grade');
 
-      //   return [row1, row2];
-      // }
+        return [row1, row2];
+      }
 
       /* ==============================================================
          GENERATE A SINGLE STUDENT ROW
@@ -279,11 +279,11 @@
         config: {
           topRows: [
             { lines: 2 },  // Row 0: Main column headers (single line)
-            // { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
+            { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
           ],
           fixedRightCols: 2
         },
-        headerRows: generateHeaders1(),
+        headerRows: generateHeaders2(),
         groups: generateGroups(),
         cellClasses: buildCellClasses(),
         cellClassFn: function (col, val) {
