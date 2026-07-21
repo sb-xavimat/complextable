@@ -187,10 +187,9 @@ footer {
     *     because .table-container remains the ONLY scrolling ancestor.
     *
     * .table-container (INNER):
-    *   - The single scroll container (overflow: auto on both axes).
-    *   - height: calc(100% + 15px) makes it 15px taller than the wrapper.
-    *   - The native horizontal scrollbar (~15px) sits in that overflow zone
-    *     and is clipped by the wrapper's overflow:hidden.
+    *   - The single scroll container (overflow-y: auto, overflow-x: hidden).
+    *   - overflow-x: hidden suppresses the native horizontal scrollbar while
+    *     still allowing programmatic scrollLeft (used by the top scrollbar sync).
     *   - The vertical scrollbar remains fully visible on the right edge.
     *   - position:sticky works for headers AND columns because this is
     *     the single scrolling ancestor.
@@ -203,7 +202,8 @@ footer {
 .table-container {
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Firefox: styled scrollbars */

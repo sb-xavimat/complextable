@@ -302,7 +302,6 @@ const Gradebook = (function () {
         }
         const resizeObserver = new ResizeObserver(function () {
             updateDummyWidth();
-            adjustTableContainerHeight();
         });
         resizeObserver.observe(table);
         resizeObserver.observe(tableContainer);
@@ -320,21 +319,6 @@ const Gradebook = (function () {
             isSyncing = true;
             topScrollbar.scrollLeft = tableContainer.scrollLeft;
         });
-
-        // Dynamically adjust .table-container height to avoid clipping last row when no horizontal scrollbar
-        function adjustTableContainerHeight() {
-            if (!containerOrTableReady()) return;
-            if (table.scrollWidth > tableContainer.clientWidth) {
-                tableContainer.style.height = 'calc(100% + 15px)';
-            } else {
-                tableContainer.style.height = '100%';
-            }
-        }
-        function containerOrTableReady() {
-            return tableContainer && table;
-        }
-        window.addEventListener('resize', adjustTableContainerHeight);
-        setTimeout(adjustTableContainerHeight, 0);
     };
 
     /* ----------------------------------------------------------
