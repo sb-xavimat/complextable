@@ -1,0 +1,14 @@
+<div class="page">
+  <app-gradebook-header />
+  <app-gradebook-breadcrumbs />
+
+  @if (state.loading()) {
+    <div class="status-overlay">Cargando...</div>
+  } @else if (state.error()) {
+    <div class="status-overlay status-overlay--error">{{ state.error() }}</div>
+  } @else {
+    <app-gradebook-table />
+  }
+
+  <app-gradebook-footer />
+</div>

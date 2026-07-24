@@ -1,0 +1,85 @@
+<!-- Scrollbar superior personalizado -->
+<div class="top-scrollbar-container" #topScrollbar>
+  <div class="top-scrollbar-dummy" #topDummy></div>
+</div>
+
+<!-- Wrapper que recorta el scrollbar h. nativo -->
+<div class="table-container-wrapper">
+  <div class="table-container" #tableContainer>
+    <table #gradebookTable>
+      <thead>
+        @for (row of state.config.topRows; track $index; let ri = $index) {
+          <tr>
+            @for (cell of state.headerRows()[ri]; track $index; let ci = $index) {
+              <th
+                [style.top]="headerGeometry().topOffsets[ri]"
+                [style.height]="headerGeometry().heightValues[ri]"
+                [class.sticky-left]="ci === 0"
+                [class.sticky-right]="ci >= firstFixedRight"
+                [class.sub-header]="ri > 0"
+                [style.right]="ci >= firstFixedRight ? stickyRightStyle(ci) : null"
+                [style.width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                [style.min-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                [style.max-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+              >
+                @if (cell.includes('\n')) {
+                  @for (line of cell.split('\n'); track line) {
+                    @if (!$last) { {{ line }}<br /> } @else { {{ line }} }
+                  }
+                } @else {
+                  {{ cell }}
+                }
+              </th>
+            }
+          </tr>
+        }
+      </thead>
+
+      <tbody>
+        @for (group of state.groups(); track group.name; let gi = $index) {
+
+          <tr class="group-name-row">
+            <td class="sticky-left">
+              <button type="button" class="group-toggle-btn" (click)="toggleGroup(gi)">
+                <img [src]="toggleIcon(group)" alt="Toggle grupo" />
+              </button>
+              {{ group.name }}
+            </td>
+            @for (c of emptyCols(); track c) { <td></td> }
+          </tr>
+
+          @for (row of groupContentRows(group); track $index) {
+            <tr>
+              @for (cell of row; track $index; let ci = $index) {
+                <td
+                  [ngClass]="cellClass(ci, cell)"
+                  [class.sticky-left]="ci === 0"
+                  [class.sticky-right]="ci >= firstFixedRight"
+                  [style.right]="ci >= firstFixedRight ? stickyRightStyle(ci) : null"
+                  [style.width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                  [style.min-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                  [style.max-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                >{{ cell }}</td>
+              }
+            </tr>
+          }
+
+          <tr class="group-averages-row">
+            @for (cell of group.averagesRow; track $index; let ci = $index) {
+              <td
+                [ngClass]="cellClass(ci, cell)"
+                [class.sticky-left]="ci === 0"
+                [class.sticky-right]="ci >= firstFixedRight"
+                [style.right]="ci >= firstFixedRight ? stickyRightStyle(ci) : null"
+                [style.width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                [style.min-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+                [style.max-width]="ci !== 0 ? 'var(--col-width-default)' : null"
+              >{{ cell }}</td>
+            }
+          </tr>
+
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

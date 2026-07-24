@@ -1,0 +1,56 @@
+// El host es un flex item de .page → flex-shrink: 0 para que no se comprima
+:host {
+  display: block;
+  flex-shrink: 0;
+}
+
+.breadcrumbs {
+  padding: 8px 20px;
+  background: var(--color-bg);
+  border-bottom: var(--border-style);
+  font-size: var(--font-size-small);
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0;
+    align-items: center;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+
+    // Separador "/"
+    &::before {
+      content: '/';
+      margin: 0 8px;
+      color: var(--color-text-light);
+    }
+
+    &:first-child::before {
+      display: none;
+    }
+  }
+
+  // Enlaces navegables
+  a {
+    color: #0066cc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #0052a3;
+      text-decoration: underline;
+    }
+  }
+
+  // Texto para la página actual (no es enlace)
+  span {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+}

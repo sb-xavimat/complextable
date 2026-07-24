@@ -5,11 +5,11 @@
 
 
 ## PER FER ###############################################<!-- MARK: Per fer -->
-* Adaptar a Angular
 
 
 ## ##############################################################
 ## FENT #####################################################<!-- MARK: Fent -->
+
 
 
 
@@ -35,3 +35,6 @@
 * BUG en Firefox i en ChromeOS: scroll vertical retalla 15px a la última fila.
     * Resolt ajustant overflows.
 * Les columnes no-sticky no necessiten amplària fixa.
+
+### 2026-07-24
+* Adaptar a Angular
