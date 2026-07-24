@@ -15,11 +15,15 @@ const routes: Routes = [
     loadComponent: () => import('./components/gradebook-layout/gradebook-layout.component').then(m => m.GradebookLayoutComponent)
   },
   {
-    path: ':classid/:unidid/:lessonid/:activid',
+    path: ':classid/:unidid/:lessonid/acts',
     loadComponent: () => import('./components/gradebook-layout/gradebook-layout.component').then(m => m.GradebookLayoutComponent)
   },
   {
-    path: ':classid/:unidid/:lessonid/:activid/:subactid',
+    path: ':classid/:unidid/:lessonid/acts/:activid',
+    loadComponent: () => import('./components/gradebook-layout/gradebook-layout.component').then(m => m.GradebookLayoutComponent)
+  },
+  {
+    path: ':classid/:unidid/:lessonid/acts/:activid/:segmentid',
     loadComponent: () => import('./components/gradebook-layout/gradebook-layout.component').then(m => m.GradebookLayoutComponent)
   },
 ];

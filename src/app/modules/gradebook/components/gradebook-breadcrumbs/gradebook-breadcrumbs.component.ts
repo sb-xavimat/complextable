@@ -37,7 +37,7 @@ export class GradebookBreadcrumbsComponent implements OnInit {
   unidid?: string;
   lessonid?: string;
   activid?: string;
-  subactid?: string;
+  segmentid?: string;
 
   // Breadcrumbs dinámicos computados
   breadcrumbs = computed<BreadcrumbItem[]>(() => {
@@ -47,7 +47,7 @@ export class GradebookBreadcrumbsComponent implements OnInit {
     items.push({
       label: `Class ${this.classid}`,
       routerLink: ['/gradebook', this.classid],
-      isActive: !this.unidid && !this.lessonid && !this.activid && !this.subactid,
+      isActive: !this.unidid && !this.lessonid && !this.activid && !this.segmentid,
     });
 
     // Unit
@@ -55,7 +55,7 @@ export class GradebookBreadcrumbsComponent implements OnInit {
       items.push({
         label: `Unit ${this.unidid}`,
         routerLink: ['/gradebook', this.classid, this.unidid],
-        isActive: !this.lessonid && !this.activid && !this.subactid,
+        isActive: !this.lessonid && !this.activid && !this.segmentid,
       });
 
       // Lesson
@@ -63,7 +63,7 @@ export class GradebookBreadcrumbsComponent implements OnInit {
         items.push({
           label: `Lesson ${this.lessonid}`,
           routerLink: ['/gradebook', this.classid, this.unidid, this.lessonid],
-          isActive: !this.activid && !this.subactid,
+          isActive: !this.activid && !this.segmentid,
         });
 
         // Activity
@@ -71,13 +71,13 @@ export class GradebookBreadcrumbsComponent implements OnInit {
           items.push({
             label: `Activity ${this.activid}`,
             routerLink: ['/gradebook', this.classid, this.unidid, this.lessonid, this.activid],
-            isActive: !this.subactid,
+            isActive: !this.segmentid,
           });
 
-          // Sub-activity
-          if (this.subactid) {
+          // Segment (dentro de sub-actividad)
+          if (this.segmentid) {
             items.push({
-              label: `Sub-Activity ${this.subactid}`,
+              label: `Segment ${this.segmentid}`,
               isActive: true, // Última en la jerarquía, no es enlace
             });
           }
@@ -97,7 +97,7 @@ export class GradebookBreadcrumbsComponent implements OnInit {
       this.unidid = params.get('unidid') ?? undefined;
       this.lessonid = params.get('lessonid') ?? undefined;
       this.activid = params.get('activid') ?? undefined;
-      this.subactid = params.get('subactid') ?? undefined;
+      this.segmentid = params.get('segmentid') ?? undefined;
     });
   }
 }

@@ -89,7 +89,7 @@ export class GradebookLayoutComponent implements OnInit, OnDestroy {
           unidid: paramMap.get('unidid') ?? undefined,
           lessonid: paramMap.get('lessonid') ?? undefined,
           activid: paramMap.get('activid') ?? undefined,
-          subactid: paramMap.get('subactid') ?? undefined,
+          segmentid: paramMap.get('segmentid') ?? undefined,
         }));
       })
     );

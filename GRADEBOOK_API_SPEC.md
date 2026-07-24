@@ -11,7 +11,7 @@ Parámetros de query opcionales (para filtrado):
 - `unidid` (string): ID de la unidad
 - `lessonid` (string): ID de la lección
 - `activid` (string): ID de la actividad
-- `subactid` (string): ID de la sub-actividad
+- `segmentid` (string): ID del apartado (dentro de la sub-actividad)
 
 ---
 

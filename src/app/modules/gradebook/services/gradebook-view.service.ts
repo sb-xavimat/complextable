@@ -14,7 +14,7 @@ export interface ViewContext {
   unidid?: string;
   lessonid?: string;
   activid?: string;
-  subactid?: string;
+  segmentid?: string;
 
   // Parámetros de visualización (vienen de query params: ?viewMode=schedule&sortBy=name)
   [key: string]: string | boolean | undefined;
