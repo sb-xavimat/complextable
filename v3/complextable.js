@@ -10,8 +10,7 @@
  * It only understands:
  *   - headerRows: array of { lines: 1|2, cells: string[] } (one per header row)
  *   - bodyRows:   arrays of cell values (one per data row)
- *   - config:     structural info (fixedRightCols)
- *   - cellClasses: optional per-column CSS class arrays for body cells
+ *   - config:     structural info (fixedRightCols, cellClasses, cellClassFn)
  *
  * All sticky offsets are built from CSS variable math — no DOM measurement.
  */
@@ -23,9 +22,10 @@ const Gradebook = (function () {
      * @param {Object} options
      * @param {Object} options.config - Structural configuration
      * @param {number} options.config.fixedRightCols - Number of sticky-right columns
+     * @param {Object} [options.config.cellClasses] - Map of column index → CSS class name(s) for body cells
+     * @param {Function} [options.config.cellClassFn] - Value-based CSS class callback
      * @param {Array<{lines: 1|2, cells: string[]}>} options.headerRows - Header row descriptors with cell labels
      * @param {Array<Array<string|number>>} options.bodyRows - One array per data row
-     * @param {Object} [options.cellClasses] - Map of column index → CSS class name(s) for body cells
      * @param {Object} options.elements - DOM element IDs
      * @param {string} options.elements.thead - ID of the <thead> element
      * @param {string} options.elements.tbody - ID of the <tbody> element
@@ -39,8 +39,6 @@ const Gradebook = (function () {
         this.config = options.config;
         this.headerRows = options.headerRows;
         this.groups = options.groups;
-        this.cellClasses = options.cellClasses || {};
-        this.cellClassFn = options.cellClassFn || null;
         this.els = options.elements;
     }
 
@@ -178,13 +176,13 @@ const Gradebook = (function () {
             }
 
             // Apply per-column CSS classes (e.g., 'score-cell')
-            if (this.cellClasses[c]) {
-                td.classList.add(this.cellClasses[c]);
+            if (this.config.cellClasses?.[c]) {
+                td.classList.add(this.config.cellClasses[c]);
             }
 
             // Apply value-based CSS class via callback
-            if (this.cellClassFn) {
-                const extra = this.cellClassFn(c, val);
+            if (this.config.cellClassFn) {
+                const extra = this.config.cellClassFn(c, val);
                 if (extra) td.classList.add(extra);
             }
 
@@ -218,7 +216,7 @@ const Gradebook = (function () {
 
         Uses a DocumentFragment for performance — appending all rows
         in one batch. Each <td> gets the same sticky-left/right logic
-        as the header, plus optional CSS classes from this.cellClasses.
+        as the header, plus optional CSS classes from this.config.cellClasses.
     ---------------------------------------------------------- */
     Gradebook.prototype._buildBody = function () {
         const tbody = document.getElementById(this.els.tbody);
@@ -363,11 +361,7 @@ const Gradebook = (function () {
         const el = document.getElementById(this.els.footerInfo);
         if (!el) return;
         const totalCols = this.headerRows[0].cells.length;
-        let studentCount = 0;
-        for (let g = 0; g < this.groups.length; g++) {
-            studentCount += this.groups[g].rows.length;
-        }
-        el.textContent = studentCount + ' Students \u2022 ' + totalCols + ' Columns';
+        el.textContent = totalCols + ' Columns';
     };
 
     return Gradebook;

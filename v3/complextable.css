@@ -376,7 +376,9 @@ tbody tr:nth-child(odd) td.sticky-right {
 }
 
 /* Center-align numeric score cells for readability */
-td.score-cell {
+td.score-cell,
+td.score-avg,
+td.score-final {
     text-align: center;
     font-weight: 700;
 }
