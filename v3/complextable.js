@@ -8,9 +8,9 @@
  *
  * It knows NOTHING about students, grades, or any domain concept.
  * It only understands:
- *   - headerRows: arrays of label strings (one per header row)
+ *   - headerRows: array of { lines: 1|2, cells: string[] } (one per header row)
  *   - bodyRows:   arrays of cell values (one per data row)
- *   - config:     structural info (topRows line counts, fixedRightCols)
+ *   - config:     structural info (fixedRightCols)
  *   - cellClasses: optional per-column CSS class arrays for body cells
  *
  * All sticky offsets are built from CSS variable math — no DOM measurement.
@@ -22,9 +22,8 @@ const Gradebook = (function () {
      * @constructor
      * @param {Object} options
      * @param {Object} options.config - Structural configuration
-     * @param {Array}  options.config.topRows - Array of { lines: 1|2 } row descriptors
      * @param {number} options.config.fixedRightCols - Number of sticky-right columns
-     * @param {Array<Array<string>>} options.headerRows - One string[] per header row
+     * @param {Array<{lines: 1|2, cells: string[]}>} options.headerRows - Header row descriptors with cell labels
      * @param {Array<Array<string|number>>} options.bodyRows - One array per data row
      * @param {Object} [options.cellClasses] - Map of column index → CSS class name(s) for body cells
      * @param {Object} options.elements - DOM element IDs
@@ -67,8 +66,8 @@ const Gradebook = (function () {
         const heightValues = [];
         const cumulativeParts = [];
 
-        for (let r = 0; r < this.config.topRows.length; r++) {
-            const rowConfig = this.config.topRows[r];
+        for (let r = 0; r < this.headerRows.length; r++) {
+            const rowConfig = this.headerRows[r];
             const heightVar = (rowConfig.lines === 1)
                 ? 'var(--row-height-1line)'
                 : 'var(--row-height-2lines)';
@@ -92,25 +91,25 @@ const Gradebook = (function () {
     /* ----------------------------------------------------------
         PRIVATE: Build <thead> rows.
 
-        For each header row defined in config.topRows, we create a
-        <tr> and populate it with <th> cells. Each <th> gets:
+        For each entry in headerRows, we create a <tr> and populate
+        it with <th> cells. Each <th> gets:
         - Inline `top` and `height` styles (CSS variable math)
         - Class `sticky-left` if it's column 0
         - Class `sticky-right` + inline `right` offset if it's a fixed-right column
     ---------------------------------------------------------- */
     Gradebook.prototype._buildHead = function () {
         const thead = document.getElementById(this.els.thead);
-        const totalCols = this.headerRows[0].length;
+        const totalCols = this.headerRows[0].cells.length;
         const fixedRight = this.config.fixedRightCols;
         const firstFixedRightIndex = totalCols - fixedRight;
         const geo = this._calcHeaderGeometry();
 
-        for (let r = 0; r < this.config.topRows.length; r++) {
+        for (let r = 0; r < this.headerRows.length; r++) {
             const tr = document.createElement('tr');
 
             for (let c = 0; c < totalCols; c++) {
                 const th = document.createElement('th');
-                const label = this.headerRows[r][c] || '';
+                const label = this.headerRows[r].cells[c] || '';
 
                 // Multi-line content (e.g. "\n" in sub-header rows)
                 if (label.indexOf('\n') !== -1) {
@@ -161,7 +160,7 @@ const Gradebook = (function () {
         @returns {HTMLTableRowElement}
     ---------------------------------------------------------- */
     Gradebook.prototype._makeDataRow = function (rowData, cssClass) {
-        const totalCols = this.headerRows[0].length;
+        const totalCols = this.headerRows[0].cells.length;
         const fixedRight = this.config.fixedRightCols;
         const firstFixedRightIndex = totalCols - fixedRight;
 
@@ -223,7 +222,7 @@ const Gradebook = (function () {
     ---------------------------------------------------------- */
     Gradebook.prototype._buildBody = function () {
         const tbody = document.getElementById(this.els.tbody);
-        const totalCols = this.headerRows[0].length;
+        const totalCols = this.headerRows[0].cells.length;
         const fragment = document.createDocumentFragment();
         let g, r, i, group, nameData;
 
@@ -363,7 +362,7 @@ const Gradebook = (function () {
         if (!this.els.footerInfo) return;
         const el = document.getElementById(this.els.footerInfo);
         if (!el) return;
-        const totalCols = this.headerRows[0].length;
+        const totalCols = this.headerRows[0].cells.length;
         let studentCount = 0;
         for (let g = 0; g < this.groups.length; g++) {
             studentCount += this.groups[g].rows.length;

@@ -138,7 +138,7 @@
         row1.push('Average');
         row1.push('Weighted Average');
 
-        return [row1];
+        return [{ lines: 2, cells: row1 }];
       }
 
       function generateHeaders2() {
@@ -157,7 +157,10 @@
         row1.push('Weighted Average');
         row2.push('Letter Grade');
 
-        return [row1, row2];
+        return [
+          { lines: 2, cells: row1 },
+          { lines: 2, cells: row2 }
+        ];
       }
 
       /* ==============================================================
@@ -275,12 +278,9 @@
       /* ==============================================================
          INITIALIZATION — Create and render the Gradebook
          ============================================================== */
-      const gradebook = new Gradebook({
+
+      const props = {
         config: {
-          topRows: [
-            { lines: 2 },  // Row 0: Main column headers (single line)
-            // { lines: 2 }   // Row 1: Sub-headers — date + max points (two lines)
-          ],
           fixedRightCols: 2
         },
         headerRows: generateHeaders1(),
@@ -300,7 +300,9 @@
           table: 'gradebookTable',
           footerInfo: 'footerInfo'
         }
-      });
+      };
+      console.log(props);
+      const gradebook = new Gradebook(props);
 
       gradebook.render();
 
